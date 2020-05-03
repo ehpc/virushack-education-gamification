@@ -3,6 +3,7 @@ import React from 'react';
 import '../funny-icon/index.scss';
 
 export default function ({ text = '', size = 'xl' }) {
+  const fontSize = 125 - 20 * (text.length - 5);
   return (
     <svg className={`funny-icon funny-icon-${size}`} enableBackground="new 0 0 497 497" height="512" viewBox="0 0 497 497" width="512" xmlns="http://www.w3.org/2000/svg">
       <g>
@@ -29,7 +30,7 @@ export default function ({ text = '', size = 'xl' }) {
           </g>
         </g>
         <g fill="#ff97c0">
-          <text style={{ fontSize: '125px', fontFamily: 'Roboto, Helvetica, Arial, sans-serif' }} x="90" y="310">{text}</text>
+          <text style={{ fontSize: `${fontSize}px`, fontFamily: 'Roboto, Helvetica, Arial, sans-serif' }} x="90" y="310">{text}</text>
         </g>
       </g>
     </svg>
