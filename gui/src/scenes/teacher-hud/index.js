@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
 import FunnyIcon from '../../components/funny-icon';
+import ClockIcon from '../../components/clock-icon';
 
 const spacing = 3;
 const lessonName = 'Математика для математиков';
@@ -76,7 +77,7 @@ export default function () {
   useEffect(() => {
     const interval = setInterval(() => {
       setDuration((prevDuration) => prevDuration + 1);
-    }, 100);
+    }, 10);
     return () => clearInterval(interval);
   }, []);
 
@@ -103,9 +104,7 @@ export default function () {
           </Typography>
         </Grid>
         <Grid className={classes.timerColumn} item md={2} xs={6}>
-          <Typography variant="h4">
-            {formatDuration(duration)}
-          </Typography>
+          <ClockIcon size="md" text={formatDuration(duration)} />
         </Grid>
       </Grid>
       <Grid
