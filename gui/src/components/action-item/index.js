@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Grow from '@material-ui/core/Grow';
 import Typography from '@material-ui/core/Typography';
@@ -9,8 +9,9 @@ import Avatar from '@material-ui/core/Avatar';
 import format from 'date-fns/format';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { getActionData } from '../../models/action-types';
+import ActionDial from '../action-dial';
 import FunnyIcon from '../funny-icon';
+import { getActionData } from '../../models/action-types';
 
 const useStyles = makeStyles((theme) => ({
   secondary: {
@@ -45,35 +46,46 @@ function formatTimestamp(timestamp) {
 
 export default memo(({ action }) => {
   const classes = useStyles();
-  const { user, time, name } = action;
+  const { user, timestamp, name } = action;
   const actionData = getActionData(name);
+
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function handleItemClick() {
+    setMenuOpen((prevMenuOpen) => !prevMenuOpen);
+  }
+
+  function handleMenuClose() {
+    setMenuOpen(false);
+  }
 
   return (
     <Grow in timeout={500}>
-      <ListItem button>
-        <ListItemAvatar>
-          <Avatar alt={user.name} src={user.avatar} />
-        </ListItemAvatar>
-        <ListItemText
-          primary={(
-            <Grid container>
-              <Grid item xs={7}>
-                <Typography variant="subtitle2">{user.name}</Typography>
+      <>
+        <ListItem button onClick={handleItemClick}>
+          <ListItemAvatar>
+            <Avatar alt={user.name} src={user.avatar} />
+          </ListItemAvatar>
+          <ListItemText
+            primary={(
+              <Grid container>
+                <Grid item xs={7}>
+                  <Typography variant="subtitle2">{user.name}</Typography>
+                </Grid>
+                <Grid className={classes.timestamp} item xs={5}>
+                  <Typography
+                    className={classes.secondary}
+                    variant="caption"
+                  >
+                    {formatTimestamp(timestamp)}
+                  </Typography>
+                </Grid>
               </Grid>
-              <Grid className={classes.timestamp} item xs={5}>
-                <Typography
-                  className={classes.secondary}
-                  variant="caption"
-                >
-                  {formatTimestamp(time)}
-                </Typography>
-              </Grid>
-            </Grid>
           )}
-          secondary={(
-            <Typography className={classes[`priority${actionData.priority}`]} variant="body2">
-              {actionData.text}
-              {
+            secondary={(
+              <Typography className={classes[`priority${actionData.priority}`]} variant="body2">
+                {actionData.text}
+                {
               actionData.icon
                 && (
                   <FunnyIcon
@@ -84,10 +96,12 @@ export default memo(({ action }) => {
                   />
                 )
               }
-            </Typography>
+              </Typography>
           )}
-        />
-      </ListItem>
+          />
+        </ListItem>
+        <ActionDial user={user} open={menuOpen} onClose={handleMenuClose} />
+      </>
     </Grow>
   );
 });
