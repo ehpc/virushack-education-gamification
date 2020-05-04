@@ -10,10 +10,13 @@ export default class TeacherRTC extends Component {
 
   componentDidMount() {
     navigator.mediaDevices
-      .getUserMedia({ audio: true, video: {
-        width: { min: 160, ideal: 640, max: 1280 },
-        height: { min: 120, ideal: 360, max: 720 },
-      }, })
+      .getUserMedia({
+        audio: true,
+        video: {
+          width: { min: 160, ideal: 640, max: 1280 },
+          height: { min: 120, ideal: 360, max: 720 },
+        },
+      })
       .then((stream) => (this.localVideo.srcObject = stream));
   }
 
