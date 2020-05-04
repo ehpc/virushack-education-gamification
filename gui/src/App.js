@@ -4,11 +4,8 @@ import {
 } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Layout from './Layout';
-<<<<<<< HEAD
-=======
 
 import './App.css';
->>>>>>> origin
 
 function App() {
   return (
