@@ -9,7 +9,7 @@ import Avatar from '@material-ui/core/Avatar';
 import format from 'date-fns/format';
 import { makeStyles } from '@material-ui/core/styles';
 
-import actionTypes from '../../models/action-types';
+import { getActionData } from '../../models/action-types';
 import FunnyIcon from '../funny-icon';
 
 const useStyles = makeStyles((theme) => ({
@@ -46,7 +46,7 @@ function formatTimestamp(timestamp) {
 export default memo(({ action }) => {
   const classes = useStyles();
   const { user, time, name } = action;
-  const actionData = actionTypes[name];
+  const actionData = getActionData(name);
 
   return (
     <Grow in timeout={500}>
