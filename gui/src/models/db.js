@@ -2,12 +2,11 @@ import firebase from 'firebase/app';
 import 'firebase/database';
 
 import { getAvatarForString } from './samples';
+import { getActionData } from './action-types';
 
 const logger = console;
 export const notSoSecret = 'ya_uchilka';
 
-logger.log('>>>', firebase);
-// TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
 
 // Initialize Firebase
@@ -17,15 +16,15 @@ const uchilkaDB = firebase.database();
 logger.log('[uchilkaDB] CONNECTED');
 firebase.database.enableLogging((message) => {
   if (message.indexOf('handleServerMessage') !== -1) {
-    logger.log('[uchilkaDB]', message);
+    // logger.log('[uchilkaDB]', message);
   }
 });
 
-// connListener
-const ref = uchilkaDB.ref('users');
-ref.orderByKey().endAt('Антонина Ивановна').on('child_added', (snapshot) => {
-  logger.log(snapshot.key, 'подключен');
-});
+// // connListener
+// const ref = uchilkaDB.ref('users');
+// ref.orderByKey().endAt('Антонина Ивановна').on('child_added', (snapshot) => {
+//   logger.log(snapshot.key, 'подключен');
+// });
 
 
 // ЗАПИСЬ НОВОГО ЮЗЕРА В БД
@@ -218,7 +217,6 @@ async function updateUserArrive(userId) {
 async function getUsers() {
   const rawQ = await uchilkaDB.ref('/users').once('value');
   const fullObject = rawQ.val();
-  logger.log(fullObject, 'this is USEEEEERS!!!');
   return fullObject;
 }
 // getUsers();
@@ -259,6 +257,7 @@ function structureData(users) {
           name: actionName,
           user,
           timestamp: Number(timestamp),
+          hidden: getActionData(actionName).hidden,
         })),
     )
     .sort((a, b) => b.timestamp - a.timestamp);
@@ -299,9 +298,40 @@ function onUsers(listener, exclusive = true) {
   usersListeners.set(listener, true);
 }
 
+// Залогинененый пользователь
+let currentUser = null;
+
+/**
+ * Логин пользователя
+ * @param {string} email Email
+ */
+async function userLogin(email) {
+  const { users } = await getStructuredData();
+  const foundUser = users.find((user) => user.email === email);
+  if (foundUser) {
+    currentUser = foundUser;
+    return foundUser;
+  }
+  return false;
+}
+
+/**
+ * Возвращает залогиненого пользователя
+ */
+function getCurrentUser() {
+  return currentUser;
+}
+
+/**
+ * Проверяет, является ли текущий пользователь учителем
+ */
+function currentUserIsTeacher() {
+  return currentUser && currentUser.teacher;
+}
+
 export default {
   updateUser,
-  // userLogin,
+  userLogin,
   updateUserCoins,
   addUser,
   updateUserStatus,
@@ -310,5 +340,7 @@ export default {
   updateUserArrive,
   getUsers,
   getStructuredData,
+  getCurrentUser,
   onUsers,
+  currentUserIsTeacher,
 };
