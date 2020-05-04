@@ -1,93 +1,85 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import sample from 'lodash/sample';
+import random from 'lodash/random';
 
+import useStyles from './styles';
+import Video from '../../components/video';
 import FunnyIcon from '../../components/funny-icon';
+import Clock from '../../components/clock';
+import ActionList from '../../components/action-list';
+import UserList from '../../components/user-list';
+import actionTypes from '../../models/action-types';
 
 const spacing = 3;
 const lessonName = 'Математика для математиков';
 const elevation = 1;
 const variant = 'elevation';
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-    width: '100%',
-  },
-  videoContainer: {
-    backgroundColor: '#000',
-    borderRadius: theme.shape.borderRadius,
-  },
-  video: {
-    maxWidth: '100%',
-  },
-  column: {
-    display: 'flex',
-  },
-  actionsColumn: {
-    order: 1,
-    [theme.breakpoints.down('sm')]: {
-      order: 2,
-    },
-  },
-  videoColumn: {
-    order: 2,
-    [theme.breakpoints.down('sm')]: {
-      order: 1,
-    },
-  },
-  usersColumn: {
-    order: 3,
-  },
-  iconColumn: {
-    order: 1,
-  },
-  headingColumn: {
-    order: 2,
-    [theme.breakpoints.down('sm')]: {
-      order: 3,
-    },
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  timerColumn: {
-    order: 3,
-    [theme.breakpoints.down('sm')]: {
-      order: 2,
-    },
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-}));
+const samplePerks = [
+  { icon: 'star' },
+  { icon: 'banana' },
+  { icon: 'sun' },
+  { icon: 'badge' },
+];
+const sampleUsers = [
+  { id: '1', name: 'Борат', avatar: '/img/samples/avatar-borat.jpg' },
+  { id: '2', name: 'Маша', avatar: '/img/samples/avatar-masha.jpg' },
+  { id: '3', name: 'Ангелина', avatar: '/img/samples/avatar-angelina.jpg' },
+  { id: '4', name: 'Seymour', avatar: '/img/samples/avatar-seymour.jpg' },
+]
+  .map((user) => {
+    user.perks = Array(random(1, 7)).fill(true).map(() => ({
+      id: random(100000), ...sample(samplePerks),
+    }));
+    return user;
+  });
+function* actionMaker() {
+  const actionKeys = Object.keys(actionTypes);
+  let id = 1;
+  while (true) {
+    yield {
+      user: sample(sampleUsers),
+      name: sample(actionKeys),
+      id,
+      time: new Date().getTime(),
+    };
+    id += 1;
+  }
+}
+const actionGenerator = actionMaker();
 
 export default function () {
   const classes = useStyles();
 
-  const [duration, setDuration] = useState(0);
+  // Информация о пользователях
+  const [users, setUsers] = useState(sampleUsers);
 
-  // Обновление времени конференции
+  // Совершённые действия
+  const [actions, setAction] = useState([]);
+
+  // Генератор действий
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDuration((prevDuration) => prevDuration + 1);
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
-  function formatDuration(seconds) {
-    const minutes = String(Math.trunc(seconds / 60));
-    const remainder = String(seconds % 60);
-    return `${minutes.padStart(2, '0')}:${remainder.padStart(2, '0')}`;
-  }
+    const timer = setTimeout(() => {
+      const newAction = actionGenerator.next().value;
+      setAction((prevActions) => [newAction].concat(prevActions));
+      setUsers((prevUsers) => prevUsers.map((user) => {
+        if (user.id === newAction.user.id) {
+          return {
+            ...user,
+            status: actionTypes[newAction.name].text,
+          };
+        }
+        return user;
+      }));
+    }, random(2000, 3000));
+    return () => clearTimeout(timer);
+  }, [actions]);
 
   return (
-    <div className={classes.root}>
+    <>
       <Grid
         container
         spacing={spacing}
@@ -103,29 +95,29 @@ export default function () {
           </Typography>
         </Grid>
         <Grid className={classes.timerColumn} item md={2} xs={6}>
-          <Typography variant="h4">
-            {formatDuration(duration)}
-          </Typography>
+          <Clock />
         </Grid>
       </Grid>
       <Grid
         container
         spacing={3}
       >
-        <Grid className={`${classes.column} ${classes.actionsColumn}`} item xs={12} md={3}>
-          <Paper className={classes.paper} variant={variant} elevation={elevation}>ACTIONS</Paper>
-        </Grid>
-        <Grid className={`${classes.column} ${classes.videoColumn}`} item xs={12} md={6}>
-          <Paper className={classes.paper} variant={variant} elevation={elevation}>
-            <div className={classes.videoContainer}>
-              <img className={classes.video} src="/img/student-webcam-example.jpg" alt="Изображение из камеры" />
-            </div>
+        <Grid className={`${classes.column} ${classes.actionsColumn}`} item xs={12} lg={3}>
+          <Paper className={`${classes.paper} ${classes.actionsPaper}`} variant={variant} elevation={elevation}>
+            <ActionList actions={actions} />
           </Paper>
         </Grid>
-        <Grid className={`${classes.column} ${classes.usersColumn}`} item xs={12} md={3}>
-          <Paper className={classes.paper} variant={variant} elevation={elevation}>USERS</Paper>
+        <Grid className={`${classes.column} ${classes.videoColumn}`} item xs={12} lg={6}>
+          <Paper className={`${classes.paper} ${classes.videoPaper}`} variant={variant} elevation={elevation}>
+            <Video />
+          </Paper>
+        </Grid>
+        <Grid className={`${classes.column} ${classes.usersColumn}`} item xs={12} lg={3}>
+          <Paper className={`${classes.paper} ${classes.usersPaper}`} variant={variant} elevation={elevation}>
+            <UserList users={users} />
+          </Paper>
         </Grid>
       </Grid>
-    </div>
+    </>
   );
 }
