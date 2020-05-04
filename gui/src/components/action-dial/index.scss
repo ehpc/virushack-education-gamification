@@ -1,0 +1,10 @@
+.MuiSpeedDial-root {
+  >button {
+    background-color: transparent;
+    box-shadow: none;
+    &:hover {
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
+}
