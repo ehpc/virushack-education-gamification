@@ -8,9 +8,9 @@ import './index.scss';
 
 const actions = [
   { icon: <FunnyIcon src="teacher-actions/add-coins" size="xxs" />, name: '+100' },
-  { icon: <FunnyIcon src="perks/star" size="xxs" />, name: 'Молодец' },
-  { icon: <FunnyIcon src="perks/badge" size="xxs" />, name: 'Часто отвечает' },
-  { icon: <FunnyIcon src="perks/sad" size="xxs" />, name: 'Совсем не отвечает' },
+  { icon: <FunnyIcon src="actions/star" size="xxs" />, name: 'Молодец' },
+  { icon: <FunnyIcon src="actions/badge" size="xxs" />, name: 'Часто отвечает' },
+  { icon: <FunnyIcon src="actions/sad" size="xxs" />, name: 'Совсем не отвечает' },
   { icon: <FunnyIcon src="teacher-actions/remove-coins" size="xxs" />, name: '-100' },
 ];
 

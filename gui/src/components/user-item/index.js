@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import FunnyIcon from '../funny-icon';
 import ActionDial from '../action-dial';
+import { getActionData } from '../../models/action-types';
 
 const useStyles = makeStyles((theme) => ({
   secondary: {
@@ -31,8 +32,9 @@ const useStyles = makeStyles((theme) => ({
 export default memo(({ user }) => {
   const classes = useStyles();
   const {
-    id, name, avatar, status, perks,
+    id, name, avatar, lastStatus, perks,
   } = user;
+  const lastStatusData = getActionData(lastStatus && lastStatus.name);
 
   return (
     <ListItem key={id} button>
@@ -50,31 +52,35 @@ export default memo(({ user }) => {
             </Grid>
             <Grid className={classes.perksContainer} item xs={5}>
               {
-              perks.length
+                perks.length > 0
                 && (
                   <Typography
                     className={`${classes.secondary} ${classes.perksList}`}
                     variant="caption"
                   >
-                    {perks.map(({ icon, id: perkId }) => (
+                    {perks.map(({ name: perkName, id: perkId }) => (
                       <FunnyIcon
                         key={perkId}
                         className={classes.perkIcon}
-                        src={`perks/${icon}`}
+                        src={`actions/${perkName}`}
                         size="xxs"
                       />
                     ))}
                   </Typography>
                 )
-            }
+              }
             </Grid>
           </Grid>
-      )}
+        )}
         secondary={(
           <Typography className={classes.secondary} variant="body2">
-            {status || <>&nbsp;</>}
+            {
+              lastStatus
+                ? lastStatusData.text
+                : <>&nbsp;</>
+            }
           </Typography>
-      )}
+        )}
       />
     </ListItem>
   );
