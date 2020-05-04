@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import firebase from "firebase";
 
-export default class studentRTC extends Component {
+export default class StudentRTC extends Component {
   constructor(props) {
     super(props);
-    state = {
+    this.state = {
       config: JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG),
       database: firebase.database().ref(),
       pc: new RTCPeerConnection(JSON.parse(process.env.REACT_APP_SERVERS)),
@@ -15,11 +15,12 @@ export default class studentRTC extends Component {
     const yourId = this.props.yourId;
     firebase.initializeApp(this.state.config);
     this.state.database.on("child_added", this.readMessage);
-    this.state.pc.onicecandidate = (event) =>
-      event.candidate
-        ? this.sendMessage(yourId, JSON.stringify({ ice: event.candidate }))
-        : console.log("Sent All Ice");
-    showMyFace();
+    const newPC = this.state.pc;
+    newPC.onicecandidate = (event) => (event.candidate
+      ? this.sendMessage(yourId, JSON.stringify({ ice: event.candidate }))
+      : console.log('Sent All Ice'));
+    this.setState({ pc: newPC });
+    this.showMyFace();
   }
 
   sendMessage(senderId, data) {
@@ -47,7 +48,7 @@ export default class studentRTC extends Component {
       .createOffer()
       .then((offer) => this.state.pc.setLocalDescription(offer))
       .then(() => {
-        sendMessage(
+        this.sendMessage(
           yourId,
           JSON.stringify({ sdp: this.state.pc.localDescription })
         );
