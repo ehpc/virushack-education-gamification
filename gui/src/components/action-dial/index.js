@@ -1,23 +1,17 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import SpeedDial from '@material-ui/lab/SpeedDial';
-import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
-import FileCopyIcon from '@material-ui/icons/FileCopyOutlined';
-import SaveIcon from '@material-ui/icons/Save';
-import PrintIcon from '@material-ui/icons/Print';
-import ShareIcon from '@material-ui/icons/Share';
-import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import FunnyIcon from '../funny-icon';
 import './index.scss';
 
 const actions = [
-  { icon: <FileCopyIcon />, name: 'Copy' },
-  { icon: <SaveIcon />, name: 'Save' },
-  { icon: <PrintIcon />, name: 'Print' },
-  { icon: <ShareIcon />, name: 'Share' },
-  { icon: <FavoriteIcon />, name: 'Like' },
+  { icon: <FunnyIcon src="teacher-actions/add-coins" size="xxs" />, name: '+100' },
+  { icon: <FunnyIcon src="perks/star" size="xxs" />, name: 'Молодец' },
+  { icon: <FunnyIcon src="perks/badge" size="xxs" />, name: 'Часто отвечает' },
+  { icon: <FunnyIcon src="perks/sad" size="xxs" />, name: 'Совсем не отвечает' },
+  { icon: <FunnyIcon src="teacher-actions/remove-coins" size="xxs" />, name: '-100' },
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -36,11 +30,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default ({ children }) => {
+export default ({ children = <></> }) => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
-  const [hidden, setHidden] = React.useState(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -54,7 +47,6 @@ export default ({ children }) => {
     <SpeedDial
       ariaLabel="Действия"
       className={classes.speedDial}
-      hidden={hidden}
       icon={children}
       onClose={handleClose}
       onOpen={handleOpen}

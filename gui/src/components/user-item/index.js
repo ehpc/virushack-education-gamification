@@ -37,8 +37,10 @@ export default memo(({ user }) => {
   return (
     <ListItem key={id} button>
       <ListItemAvatar>
-        <Avatar alt={name} src={avatar} />
-        <ActionDial />
+        <>
+          <Avatar alt={name} src={avatar} />
+          <ActionDial />
+        </>
       </ListItemAvatar>
       <ListItemText
         primary={(
