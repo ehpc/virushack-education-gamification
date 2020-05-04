@@ -46,7 +46,7 @@ function formatTimestamp(timestamp) {
 
 export default memo(({ action }) => {
   const classes = useStyles();
-  const { user, time, name } = action;
+  const { user, timestamp, name } = action;
   const actionData = getActionData(name);
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -77,7 +77,7 @@ export default memo(({ action }) => {
                     className={classes.secondary}
                     variant="caption"
                   >
-                    {formatTimestamp(time)}
+                    {formatTimestamp(timestamp)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -100,7 +100,7 @@ export default memo(({ action }) => {
           )}
           />
         </ListItem>
-        <ActionDial open={menuOpen} onClose={handleMenuClose} />
+        <ActionDial user={user} open={menuOpen} onClose={handleMenuClose} />
       </>
     </Grow>
   );
