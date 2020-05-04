@@ -88,24 +88,25 @@
 
 
 		// ЗАЛОГИНИТЬСЯ 
-/*		async function userLogin(email, pwd) {
-			
-				const userCred = await uchilkaDB.ref('users').child("email").push();
-				console.log(userCred);
-*/				
-/*				const updatedCoins = await uchilkaDB.ref('users/' + userId).update({
-					coins
-				}, function(error) {
-					if (error) {
-						console.log('updateUserCoins failed');
+		async function userLogin(email, pwd) {
+			try{
+				const rawQ = await uchilkaDB.ref('/users').once('value');
+				let fullObject = rawQ.val();
+				let keys = Object.keys(fullObject);
+				for (keys in fullObject) {
+					if (fullObject[keys].email == email && fullObject[keys].pwd == pwd){
+						console.log(fullObject[keys].email, fullObject[keys].pwd, 'authorized');
+						return true;
 					} else {
-						console.log('updateUserCoins suckcess, ' + coins + ' now');
+						console.log('401 gay attempt');
+						return false;
 					}
-				});
-				return updatedCoins;
-			
-		}	*/
-		//userLogin('ollll@mail.ru', '123123');
+				}
+			} catch(error){
+				console.log('userLogin ERROR');
+			}
+		};
+		//userLogin('ol@mail.ru', '123123');
 
 
 		// ДОБАВИТЬ/ОТНЯТЬ КОИНЫ
@@ -124,7 +125,7 @@
 				}
 				return updatedCoins;
 			}
-		}	
+		};
 		//updateUserCoins('user_3q5shnlak6a1gyz', 'ya_uchilka', 5000); 
 
 
@@ -148,7 +149,7 @@
 				}
 				return latestUserStatus;
 			}
-		}	
+		};
 		//updateUserStatus('user_3q5shnlak6a1gyz', 'ya_uchilka', 'прогульщик'); 
 
 
@@ -170,7 +171,7 @@
 				console.log(error, 'updateUserState failed');
 			}
 				return latestUserState;
-		}	
+		};
 		//updateUserState('user_3q5shnlak6a1gyz', 'ответил ДА');
 
 
@@ -189,7 +190,7 @@
 				console.log(error, 'updateUserAway failed');
 			}
 			return updatedUserAway;
-		}	
+		};
 		//updateUserAway('user_3q5shnlak6a1gyz');
 
 
@@ -208,8 +209,19 @@
 			}
 			//console.log(updatedUserArrive);
 			return updatedUserArrive;
-		}	
+		};
 		//updateUserArrive('user_3q5shnlak6a1gyz');
+
+
+		//ПОЛУЧИТЬ ИЗ СПИСОК ЮЗЕРОВ 
+		async function getUsers(){
+			const rawQ = await uchilkaDB.ref('/users').once('value');
+			let fullObject = rawQ.val();
+			console.log(fullObject,'this is USEEEEERS!!!');
+			return fullObject;
+		};
+		//getUsers();
+
 
 	};
 	//fire();
