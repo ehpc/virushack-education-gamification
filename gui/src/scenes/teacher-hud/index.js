@@ -3,6 +3,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
 import sample from 'lodash/sample';
 import random from 'lodash/random';
 
@@ -85,7 +86,9 @@ export default () => {
         spacing={theme.layoutSpacing}
       >
         <Grid className={classes.iconColumn} item md={2} xs={6}>
-          <FunnyIcon src="kitty/016-kitty-33" size="md" />
+          <Link to="/">
+            <FunnyIcon src="kitty/016-kitty-33" size="md" />
+          </Link>
         </Grid>
         <Grid className={classes.headingColumn} item md={8} xs={12}>
           <Typography variant="h4">

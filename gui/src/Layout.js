@@ -7,7 +7,6 @@ import { ThemeProvider } from '@material-ui/styles';
 
 import Login from './scenes/login';
 import TeacherHud from './scenes/teacher-hud';
-import StudentHud from './scenes/student-hud';
 
 const customTheme = createMuiTheme({
   palette: {
