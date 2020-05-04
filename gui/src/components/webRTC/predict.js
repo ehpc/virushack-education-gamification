@@ -1,9 +1,4 @@
-import * as tf from '@tensorflow/tfjs';
-import * as handTrack from 'handtrackjs';
-import * as faceapi from 'face-api.js';
-
-
-export default async function predict(src) {
+export default async function predict(src, mobilenet, model, tf, handTrack, faceapi) {
   function cropImage(img) {
     const size = Math.min(img.shape[0], img.shape[1]);
     const centerHeight = img.shape[0] / 2;
@@ -17,7 +12,7 @@ export default async function predict(src) {
     // ANYONE IN CAMERA?
     const detection = await faceapi.detectSingleFace(
       img,
-      new faceapi.SsdMobilenetv1Options({ minConfidence: 0.05 })
+      new faceapi.SsdMobilenetv1Options({ minConfidence: 0.03 })
     ); //.withFaceExpressions();
     // console.log(detection);
     return detection;
@@ -25,7 +20,9 @@ export default async function predict(src) {
 
   async function findHands(img) {
     // ANY HANDS IN CAMERA?
-    const modelParams = {
+
+    // hands model
+    const modelParams = { 
       flipHorizontal: true,   // flip e.g for video 
       imageScaleFactor: 0.7,  // reduce input image size for gains in speed.
       maxNumBoxes: 20,        // maximum number of boxes to detect
@@ -34,23 +31,24 @@ export default async function predict(src) {
     }
     // Load the model.
     const handModel = await handTrack.load(modelParams);
+
     // detect objects in the image.
     const handPredictions = await handModel.detect(img)
     return handPredictions;
   }
 
   async function recognizeGestures(img) {
-    //  LOAD MOBILENET
-    let mobilenet = await tf.loadLayersModel(
-      'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
+    // //  LOAD MOBILENET
+    // let mobilenet = await tf.loadLayersModel(
+    //   'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
 
-    // Return a model that outputs an internal activation.
-    const layer = mobilenet.getLayer('conv_pw_13_relu');
-    mobilenet = tf.model({ inputs: mobilenet.inputs, outputs: layer.output });
+    // // Return a model that outputs an internal activation.
+    // const layer = mobilenet.getLayer('conv_pw_13_relu');
+    // mobilenet = tf.model({ inputs: mobilenet.inputs, outputs: layer.output });
 
-    // IMAGE PROCESSING
-    // const model = await tf.loadLayersModel('http://localhost:3000/gest-model-2/model.json');
-    const model = await tf.loadLayersModel('http://localhost:3000/gest-model/model.json');
+    // // IMAGE PROCESSING
+    // // const model = await tf.loadLayersModel('http://localhost:3000/gest-model-2/model.json');
+    // const model = await tf.loadLayersModel('http://localhost:3000/gest-model/model.json');
 
     const webcamImage = tf.browser.fromPixels(img);
     const reversedImage = webcamImage.reverse(1);
@@ -87,6 +85,8 @@ export default async function predict(src) {
     if (face) {
       // Find hands.
       const hands = await findHands(snapshot);
+      console.log(hands);
+      
       if (hands.length) {
         // Recognize gestures.
         actIndex = await recognizeGestures(snapshot);

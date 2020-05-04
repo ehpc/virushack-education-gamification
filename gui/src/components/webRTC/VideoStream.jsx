@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
-import * as faceapi from 'face-api.js';
+// import * as faceapi from 'face-api.js';
 import predict from './predict';
+
+import * as tf from '@tensorflow/tfjs';
+import * as handTrack from 'handtrackjs';
+import * as faceapi from 'face-api.js';
+
 
 const actions = [
   'Поднял руку(л)',
@@ -23,32 +28,39 @@ export default class TeacherRTC extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     faceapi.nets.ssdMobilenetv1.loadFromUri('/face-models')
     faceapi.loadFaceDetectionModel('/face-models');
     // faceapi.loadFaceExpressionModel('/face-models');
+    
+    let mobilenet = await tf.loadLayersModel(
+      'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
+    const layer = mobilenet.getLayer('conv_pw_13_relu');
+    mobilenet = tf.model({ inputs: mobilenet.inputs, outputs: layer.output });
+    const model = await tf.loadLayersModel('http://localhost:3000/gest-model/model.json');
   
 
     navigator.mediaDevices
       .getUserMedia({
         audio: true,
         video: {
-          width: { min: 160, ideal: 640, max: 1280 },
-          height: { min: 120, ideal: 360, max: 720 },
+          width: { min: 160, ideal: 224, max: 448},//640, max: 1280 },
+          height: { min: 120, ideal: 224, max: 448},//360, max: 720 },
         },
       })
       .then((stream) => {
-        // console.log(stream);
+        console.log('stream');
         setInterval(() => {
           const src = this.snapshot();
-          predict(src).then((prediction) => console.log(actions[prediction]));
-        }, 5000);
+          predict(src, mobilenet, model, tf, handTrack, faceapi)
+            .then((prediction) => console.log(actions[prediction]));
+        }, 4000);
         return this.localVideo.srcObject = stream;
       })
   }
 
   snapshot() {
-    var video = document.querySelector("video");
+    var video = document.querySelector('video');
     var canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
@@ -69,8 +81,8 @@ export default class TeacherRTC extends Component {
   render() {
     return <div>
       <video autoPlay muted ref={(video) => (this.localVideo = video)} />
-      <button onClick={this.snapshot}>SNAPSHOT!</button>
-      <div id='x'></div>
+      {/* <button onClick={this.snapshot}>SNAPSHOT!</button> */}
+      {/* <div id='x'></div> */}
     </div>
   }
 }
