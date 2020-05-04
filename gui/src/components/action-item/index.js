@@ -50,7 +50,7 @@ export default memo(({ action }) => {
 
   return (
     <Grow in timeout={500}>
-      <ListItem>
+      <ListItem button>
         <ListItemAvatar>
           <Avatar alt={user.name} src={user.avatar} />
         </ListItemAvatar>
