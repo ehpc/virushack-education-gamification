@@ -1,0 +1,6 @@
+{
+  "root": "gui/build/",
+  "routes": {
+    "/**": "index.html"
+  }
+}

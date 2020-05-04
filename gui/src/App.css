@@ -1,0 +1,23 @@
+body {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+@keyframes fakeVideo {
+  from {
+    transform: scale(1.0);
+    filter: blur(0);
+  }
+
+  to {
+    transform: scale(1.005);
+    filter: blur(0.5px);
+  }
+}
+
+#video {
+    animation-duration: 0.3s;
+    animation-name: fakeVideo;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
