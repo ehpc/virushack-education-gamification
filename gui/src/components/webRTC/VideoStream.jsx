@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import * as faceapi from 'face-api.js';
 import predict from './predict';
 
 import * as tf from '@tensorflow/tfjs';
@@ -54,7 +53,7 @@ export default class TeacherRTC extends Component {
           const src = this.snapshot();
           predict(src, mobilenet, model, tf, handTrack, faceapi)
             .then((prediction) => console.log(actions[prediction]));
-        }, 4000);
+        }, 6000);
         return this.localVideo.srcObject = stream;
       })
   }
@@ -63,26 +62,18 @@ export default class TeacherRTC extends Component {
     var video = document.querySelector('video');
     var canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-
     const width = video.videoWidth;
     const height = video.videoHeight;
-
     canvas.width = width;
     canvas.height = height;
-
     context.drawImage(video, 0, 0, width, height);
-  
     const src = canvas.toDataURL('image/jpg');
-    // const img = new Image();
-    // img.src = src;
     return src;
   }
 
   render() {
     return <div>
       <video autoPlay muted ref={(video) => (this.localVideo = video)} />
-      {/* <button onClick={this.snapshot}>SNAPSHOT!</button> */}
-      {/* <div id='x'></div> */}
     </div>
   }
 }

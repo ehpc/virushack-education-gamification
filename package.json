@@ -1,0 +1,28 @@
+{
+  "name": "virushack-education-gamification",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd gui && npm install && npx yarn build",
+    "eslint-fix": "eslint --fix ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ehpc/virushack-education-gamification.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/ehpc/virushack-education-gamification/issues"
+  },
+  "homepage": "https://github.com/ehpc/virushack-education-gamification#readme",
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^2.5.1"
+  },
+  "license": "UNLICENSED"
+}

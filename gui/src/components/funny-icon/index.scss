@@ -1,4 +1,12 @@
 .funny-icon {
+  &-xxxs {
+    width: 16px;
+    height: 16px;
+  }
+  &-xxs {
+    width: 24px;
+    height: 24px;
+  }
   &-xs {
     width: 32px;
     height: 32px;
@@ -18,5 +26,8 @@
   &-xl {
     width: 512px;
     height: 512px;
+  }
+  &-fit {
+    max-width: 100%;
   }
 }

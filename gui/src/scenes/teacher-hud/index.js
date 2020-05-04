@@ -1,133 +1,136 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import { useTheme } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { Link } from 'react-router-dom';
+import random from 'lodash/random';
 
+import useStyles from './styles';
+import Video from '../../components/video';
 import FunnyIcon from '../../components/funny-icon';
 import VideoStream from '../../components/webRTC/VideoStream';
+import Clock from '../../components/clock';
+import ActionList from '../../components/action-list';
+import UserList from '../../components/user-list';
+import { getActionData } from '../../models/action-types';
+import dbModel from '../../models/db';
+import { actionGenerator, sampleUsers } from '../../models/samples';
 
-const spacing = 3;
-const lessonName = 'Математика для математиков';
-const elevation = 1;
-const variant = 'elevation';
+const roomName = 'Урок "Математика для математиков"';
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-    width: '100%',
-  },
-  videoContainer: {
-    backgroundColor: '#000',
-    borderRadius: theme.shape.borderRadius,
-  },
-  video: {
-    maxWidth: '100%',
-  },
-  column: {
-    display: 'flex',
-  },
-  actionsColumn: {
-    order: 1,
-    [theme.breakpoints.down('sm')]: {
-      order: 2,
-    },
-  },
-  videoColumn: {
-    order: 2,
-    [theme.breakpoints.down('sm')]: {
-      order: 1,
-    },
-  },
-  usersColumn: {
-    order: 3,
-  },
-  iconColumn: {
-    order: 1,
-  },
-  headingColumn: {
-    order: 2,
-    [theme.breakpoints.down('sm')]: {
-      order: 3,
-    },
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  timerColumn: {
-    order: 3,
-    [theme.breakpoints.down('sm')]: {
-      order: 2,
-    },
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-}));
+const fakeIt = false;
+const defaultActions = Array(20).fill(true).map(() => actionGenerator.next().value);
 
-export default function () {
+export default () => {
+  const theme = useTheme();
   const classes = useStyles();
 
-  const [duration, setDuration] = useState(0);
+  // Информация о пользователях
+  const [users, setUsers] = useState(fakeIt ? sampleUsers : null);
 
-  // Обновление времени конференции
+  // Совершённые действия
+  const [actions, setActions] = useState(fakeIt ? defaultActions : null);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDuration((prevDuration) => prevDuration + 1);
-    }, 100);
-    return () => clearInterval(interval);
+    (async () => {
+      const {
+        users: initialUsers,
+        actions: initialActions,
+      } = await dbModel.getStructuredData();
+      setUsers(initialUsers);
+      setActions(initialActions);
+    })();
   }, []);
 
-  function formatDuration(seconds) {
-    const minutes = String(Math.trunc(seconds / 60));
-    const remainder = String(seconds % 60);
-    return `${minutes.padStart(2, '0')}:${remainder.padStart(2, '0')}`;
+  useEffect(() => {
+    dbModel.onUsers(({ actions: newActions, users: newUsers }) => {
+      setActions(newActions);
+      setUsers(newUsers);
+    });
+  }, []);
+
+  // Генератор действий
+  if (fakeIt) {
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        const newAction = actionGenerator.next().value;
+        setActions((prevActions) => [newAction].concat(prevActions));
+        setUsers((prevUsers) => prevUsers.map((user) => {
+          if (user.id === newAction.user.id) {
+            return {
+              ...user,
+              status: getActionData(newAction.name).text,
+            };
+          }
+          return user;
+        }));
+      }, random(1000, 3000));
+      return () => clearTimeout(timer);
+    }, [actions]);
   }
 
   return (
-    <div className={classes.root}>
+    <>
       <Grid
         container
-        spacing={spacing}
+        spacing={theme.layoutSpacing}
       >
         <Grid className={classes.iconColumn} item md={2} xs={6}>
-          <FunnyIcon src="kitty/016-kitty-33" size="md" />
+          <Link to="/">
+            <FunnyIcon src="kitty/016-kitty-33" size="md" />
+          </Link>
         </Grid>
         <Grid className={classes.headingColumn} item md={8} xs={12}>
           <Typography variant="h4">
-            Урок &quot;
-            {lessonName}
-            &quot;
+            {roomName}
           </Typography>
         </Grid>
         <Grid className={classes.timerColumn} item md={2} xs={6}>
-          <Typography variant="h4">
-            {formatDuration(duration)}
-          </Typography>
+          <Clock />
         </Grid>
       </Grid>
       <Grid
         container
-        spacing={3}
+        spacing={theme.layoutSpacing}
       >
-        <Grid className={`${classes.column} ${classes.actionsColumn}`} item xs={12} md={3}>
-          <Paper className={classes.paper} variant={variant} elevation={elevation}>ACTIONS</Paper>
-        </Grid>
-        <Grid className={`${classes.column} ${classes.videoColumn}`} item xs={12} md={6}>
-          <Paper className={classes.paper} variant={variant} elevation={elevation}>
-            <div className={classes.videoContainer}>
-              <VideoStream/>
-              {/* <img className={classes.video} src="/img/student-webcam-example.jpg" alt="Изображение из камеры" /> */}
-            </div>
+        <Grid className={`${classes.column} ${classes.actionsColumn}`} item xs={12} lg={3}>
+          <Paper
+            className={`${classes.paper} ${classes.actionsPaper}`}
+            variant={theme.layoutPaperVariant}
+            elevation={theme.layoutPaperElevation}
+          >
+            {
+              actions
+                ? <ActionList actions={actions} />
+                : <CircularProgress />
+            }
           </Paper>
         </Grid>
-        <Grid className={`${classes.column} ${classes.usersColumn}`} item xs={12} md={3}>
-          <Paper className={classes.paper} variant={variant} elevation={elevation}>USERS</Paper>
+        <Grid className={`${classes.column} ${classes.videoColumn}`} item xs={12} lg={6}>
+          <Paper
+            className={`${classes.paper} ${classes.videoPaper}`}
+            variant={theme.layoutPaperVariant}
+            elevation={theme.layoutPaperElevation}
+          >
+            <VideoStream/>
+          </Paper>
+        </Grid>
+        <Grid className={`${classes.column} ${classes.usersColumn}`} item xs={12} lg={3}>
+          <Paper
+            className={`${classes.paper} ${classes.usersPaper}`}
+            variant={theme.layoutPaperVariant}
+            elevation={theme.layoutPaperElevation}
+          >
+            {
+              users
+                ? <UserList users={users} />
+                : <CircularProgress />
+            }
+          </Paper>
         </Grid>
       </Grid>
-    </div>
+    </>
   );
-}
+};
