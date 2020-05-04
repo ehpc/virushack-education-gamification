@@ -1,0 +1,22 @@
+.funny-icon {
+  &-xs {
+    width: 32px;
+    height: 32px;
+  }
+  &-sm {
+    width: 64px;
+    height: 64px;
+  }
+  &-md {
+    width: 128px;
+    height: 128px;
+  }
+  &-lg {
+    width: 256px;
+    height: 256px;
+  }
+  &-xl {
+    width: 512px;
+    height: 512px;
+  }
+}
