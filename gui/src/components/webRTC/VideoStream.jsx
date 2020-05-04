@@ -44,8 +44,8 @@ export default class TeacherRTC extends Component {
       .getUserMedia({
         audio: true,
         video: {
-          width: { min: 160, ideal: 224, max: 448},//640, max: 1280 },
-          height: { min: 120, ideal: 224, max: 448},//360, max: 720 },
+          width: { min: 160, ideal: 640, max: 640}, //640, max: 1280 },
+          height: { min: 120, ideal: 540, max: 540}, //360, max: 720 },
         },
       })
       .then((stream) => {

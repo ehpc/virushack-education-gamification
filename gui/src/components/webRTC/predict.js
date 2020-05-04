@@ -27,7 +27,7 @@ export default async function predict(src, mobilenet, model, tf, handTrack, face
       imageScaleFactor: 0.7,  // reduce input image size for gains in speed.
       maxNumBoxes: 20,        // maximum number of boxes to detect
       iouThreshold: 0.5,      // ioU threshold for non-max suppression
-      scoreThreshold: 0.79,    // confidence threshold for predictions.
+      scoreThreshold: 0.3,    // confidence threshold for predictions.
     }
     // Load the model.
     const handModel = await handTrack.load(modelParams);
@@ -85,7 +85,7 @@ export default async function predict(src, mobilenet, model, tf, handTrack, face
     if (face) {
       // Find hands.
       const hands = await findHands(snapshot);
-      console.log(hands);
+      // console.log(hands);
       
       if (hands.length) {
         // Recognize gestures.
