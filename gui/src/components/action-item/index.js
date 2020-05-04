@@ -12,6 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ActionDial from '../action-dial';
 import FunnyIcon from '../funny-icon';
 import { getActionData } from '../../models/action-types';
+import dbModel from '../../models/db';
 
 const useStyles = makeStyles((theme) => ({
   secondary: {
@@ -52,7 +53,9 @@ export default memo(({ action }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function handleItemClick() {
-    setMenuOpen((prevMenuOpen) => !prevMenuOpen);
+    if (dbModel.currentUserIsTeacher()) {
+      setMenuOpen((prevMenuOpen) => !prevMenuOpen);
+    }
   }
 
   function handleMenuClose() {

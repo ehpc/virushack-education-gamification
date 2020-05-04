@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
-  Route, Switch, Redirect,
+  Route, Switch, Redirect, useHistory,
 } from 'react-router-dom';
 import { makeStyles, createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
@@ -40,7 +40,7 @@ export default function () {
             <TeacherHud />
           </Route>
           <Route>
-            <Redirect to="/login" />
+            <Redirect to="/" />
           </Route>
         </Switch>
       </div>
