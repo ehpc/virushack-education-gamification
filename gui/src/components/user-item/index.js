@@ -34,7 +34,7 @@ export default memo(({ user }) => {
   } = user;
 
   return (
-    <ListItem key={id}>
+    <ListItem key={id} button>
       <ListItemAvatar>
         <Avatar alt={name} src={avatar} />
       </ListItemAvatar>

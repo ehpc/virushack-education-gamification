@@ -7,16 +7,14 @@ import { ThemeProvider } from '@material-ui/styles';
 
 import Login from './scenes/login';
 import TeacherHud from './scenes/teacher-hud';
-import StudentHud from './scenes/student-hud';
 
 const customTheme = createMuiTheme({
   palette: {
     // type: 'dark',
-    background: {
-      // paper: '#083D77',
-      // default: '#083D77',
-    },
   },
+  layoutSpacing: 3,
+  layoutPaperElevation: 1,
+  layoutPaperVariant: 'elevation',
 });
 
 const useStyles = makeStyles((theme) => ({
@@ -33,17 +31,17 @@ export default function () {
     <ThemeProvider theme={customTheme}>
       <div className={classes.root}>
         <Switch>
-          <Route path="/login">
+          <Route exact path="/">
             <Login />
           </Route>
           <Route path="/student">
-            <StudentHud />
+            <TeacherHud />
           </Route>
           <Route path="/teacher">
             <TeacherHud />
           </Route>
           <Route>
-            <Redirect to="/teacher" />
+            <Redirect to="/login" />
           </Route>
         </Switch>
       </div>
