@@ -3,6 +3,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { Link } from 'react-router-dom';
 import random from 'lodash/random';
 
@@ -26,10 +27,10 @@ export default () => {
   const classes = useStyles();
 
   // Информация о пользователях
-  const [users, setUsers] = useState(fakeIt ? sampleUsers : []);
+  const [users, setUsers] = useState(fakeIt ? sampleUsers : null);
 
   // Совершённые действия
-  const [actions, setAction] = useState(fakeIt ? defaultActions : []);
+  const [actions, setActions] = useState(fakeIt ? defaultActions : null);
 
   useEffect(() => {
     (async () => {
@@ -38,8 +39,15 @@ export default () => {
         actions: initialActions,
       } = await dbModel.getStructuredData();
       setUsers(initialUsers);
-      setAction(initialActions);
+      setActions(initialActions);
     })();
+  }, []);
+
+  useEffect(() => {
+    dbModel.onUsers(({ actions: newActions, users: newUsers }) => {
+      setActions(newActions);
+      setUsers(newUsers);
+    });
   }, []);
 
   // Генератор действий
@@ -47,7 +55,7 @@ export default () => {
     useEffect(() => {
       const timer = setTimeout(() => {
         const newAction = actionGenerator.next().value;
-        setAction((prevActions) => [newAction].concat(prevActions));
+        setActions((prevActions) => [newAction].concat(prevActions));
         setUsers((prevUsers) => prevUsers.map((user) => {
           if (user.id === newAction.user.id) {
             return {
@@ -92,7 +100,11 @@ export default () => {
             variant={theme.layoutPaperVariant}
             elevation={theme.layoutPaperElevation}
           >
-            <ActionList actions={actions} />
+            {
+              actions
+                ? <ActionList actions={actions} />
+                : <CircularProgress />
+            }
           </Paper>
         </Grid>
         <Grid className={`${classes.column} ${classes.videoColumn}`} item xs={12} lg={6}>
@@ -110,7 +122,11 @@ export default () => {
             variant={theme.layoutPaperVariant}
             elevation={theme.layoutPaperElevation}
           >
-            <UserList users={users} />
+            {
+              users
+                ? <UserList users={users} />
+                : <CircularProgress />
+            }
           </Paper>
         </Grid>
       </Grid>

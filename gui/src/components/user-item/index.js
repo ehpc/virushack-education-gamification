@@ -93,7 +93,7 @@ export default memo(({ user }) => {
         )}
         />
       </ListItem>
-      <ActionDial open={menuOpen} onClose={handleMenuClose} />
+      <ActionDial user={user} open={menuOpen} onClose={handleMenuClose} />
     </>
   );
 });

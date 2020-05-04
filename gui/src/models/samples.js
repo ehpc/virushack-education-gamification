@@ -21,6 +21,15 @@ export function getRandomAvatar() {
   return sample(avatars);
 }
 
+export function getAvatarForString(str) {
+  const hash = str
+    .split('')
+    .map(x => x.charCodeAt(0))
+    .reduce((acc, x) => acc +x, 0)
+    % avatars.length;
+  return avatars[hash];
+}
+
 export const sampleUsers = [
   { id: '1', name: 'Борат', avatar: avatars[0] },
   { id: '2', name: 'Маша', avatar: avatars[1] },
@@ -42,7 +51,7 @@ export function* actionMaker() {
       user: sample(sampleUsers),
       name: sample(actionKeys),
       id,
-      time: new Date().getTime(),
+      timestamp: Date.now(),
     };
     id += 1;
   }
@@ -56,4 +65,5 @@ export default {
   actionMaker,
   actionGenerator,
   getRandomAvatar,
+  getAvatarForString,
 };

@@ -1,9 +1,10 @@
 import firebase from 'firebase/app';
 import 'firebase/database';
 
-import { getRandomAvatar } from './samples';
+import { getAvatarForString } from './samples';
 
 const logger = console;
+export const notSoSecret = 'ya_uchilka';
 
 logger.log('>>>', firebase);
 // TODO: Replace the following with your app's Firebase project configuration
@@ -129,7 +130,7 @@ async function updateUserCoins(userId, secret, coinsss) {
 // ИЗМЕНИТЬ СТАТУС
 async function updateUserStatus(userId, secret, status) {
   if (secret === 'ya_uchilka') {
-    const now = Math.floor(Date.now() / 1000);
+    const now = Date.now();
     const userStatusQ = await uchilkaDB.ref(`/users/${userId}`).once('value');
     let userStatus = userStatusQ.val().status;
     if (!userStatus || userStatus.length < 3) { userStatus = {}; }
@@ -154,7 +155,7 @@ async function updateUserStatus(userId, secret, status) {
 
 // ИЗМЕНИТЬ СОСТОЯНИЕ
 async function updateUserState(userId, state) {
-  const now = Math.floor(Date.now() / 1000);
+  const now = Date.now();
   const userStateQ = await uchilkaDB.ref(`/users/${userId}`).once('value');
   let userState = userStateQ.val().state;
   if (!userState || userState.length < 3) { userState = {}; }
@@ -177,7 +178,7 @@ async function updateUserState(userId, state) {
 
 // ОТОЙТИ С ПРЕДУПРЕЖДЕНИЕМ
 async function updateUserAway(userId) {
-  const now = Math.floor(Date.now() / 1000);
+  const now = Date.now();
   const updatedUserAway = JSON.stringify({ [userId]: [now] });
   updateUserState(userId, 'отошел с предупреждением');
   setTimeout(updateUserState, 10000, 'отошел без предупреждения');
@@ -196,7 +197,7 @@ async function updateUserAway(userId) {
 
 // ВЕРНУТЬСЯ
 async function updateUserArrive(userId) {
-  const now = Math.floor(Date.now() / 1000);
+  const now = Date.now();
   const updatedUserArrive = JSON.stringify({ [userId]: [now] });
   updateUserState(userId, 'на месте');
   try {
@@ -222,23 +223,27 @@ async function getUsers() {
 }
 // getUsers();
 
-async function getStructuredData() {
-  const users = Object.entries(await getUsers())
+/**
+ * Структурирует данные БД, чтобы легче работать
+ * @param {object} users Объект с пользователями
+ */
+function structureData(users) {
+  const usersStructured = Object.entries(users)
     .map(([id, user]) => {
       if (!user.id) {
         user.id = id;
       }
       if (!user.avatar) {
-        user.avatar = getRandomAvatar();
+        user.avatar = getAvatarForString(user.name);
       }
       if (!user.perks) {
         user.perks = Object.entries(user.status || [])
           .map(([timestamp, perkName]) => ({
             id: `${user.id}#${timestamp}`,
-            time: Number(timestamp),
+            timestamp: Number(timestamp),
             name: perkName,
           }))
-          .sort((a, b) => b.time - a.time);
+          .sort((a, b) => b.timestamp - a.timestamp);
       }
       user.lastStatus = user.perks.length
         ? user.perks[user.perks.length - 1]
@@ -246,24 +251,52 @@ async function getStructuredData() {
       return user;
     })
     .sort((a, b) => a.name.localeCompare(b.name));
-  const actions = users
-    .flatMap((user) => {
-      if (user.state) {
-        return Object.entries(user.state)
-          .map(([timestamp, actionName]) => ({
-            id: `${user.id}#${timestamp}`,
-            name: actionName,
-            user,
-            time: Number(timestamp),
-          }));
-      }
-      return [];
-    })
+  const actions = usersStructured
+    .flatMap(
+      (user) => Object.entries(user.state || {})
+        .map(([timestamp, actionName]) => ({
+          id: `${user.id}#${timestamp}`,
+          name: actionName,
+          user,
+          timestamp: Number(timestamp),
+        })),
+    )
     .sort((a, b) => b.timestamp - a.timestamp);
   return {
-    users,
+    users: usersStructured,
     actions,
   };
+}
+
+/**
+ * Получает данные пользователей в структурированном виде
+ */
+async function getStructuredData() {
+  return structureData(await getUsers());
+}
+
+// Слушаем изменения в юзерах
+const usersListeners = new Map();
+const usersRef = firebase.database().ref('users');
+usersRef.on('value', (snapshot) => {
+  const data = structureData(snapshot.val());
+  Array.from(usersListeners.keys()).forEach((listener) => {
+    if (typeof listener === 'function') {
+      listener(data);
+    }
+  });
+});
+
+/**
+ * Навешивает слушатель обновлений в юзерах
+ * @param {function} listener Слушатель
+ * @param {boolean} exclusive Может быть только один слушатель
+ */
+function onUsers(listener, exclusive = true) {
+  if (exclusive) {
+    usersListeners.clear();
+  }
+  usersListeners.set(listener, true);
 }
 
 export default {
@@ -277,4 +310,5 @@ export default {
   updateUserArrive,
   getUsers,
   getStructuredData,
+  onUsers,
 };
