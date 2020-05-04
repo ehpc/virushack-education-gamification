@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export default class TeacherRTC extends Component {
+export default class VideoStream extends Component {
   constructor() {
     super();
     this.state = {
