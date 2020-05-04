@@ -8,6 +8,7 @@ import Avatar from '@material-ui/core/Avatar';
 import { makeStyles } from '@material-ui/core/styles';
 
 import FunnyIcon from '../funny-icon';
+import ActionDial from '../action-dial';
 
 const useStyles = makeStyles((theme) => ({
   secondary: {
@@ -36,7 +37,10 @@ export default memo(({ user }) => {
   return (
     <ListItem key={id} button>
       <ListItemAvatar>
-        <Avatar alt={name} src={avatar} />
+        <>
+          <Avatar alt={name} src={avatar} />
+          <ActionDial />
+        </>
       </ListItemAvatar>
       <ListItemText
         primary={(
