@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import ListItem from '@material-ui/core/ListItem';
@@ -31,27 +31,37 @@ const useStyles = makeStyles((theme) => ({
 
 export default memo(({ user }) => {
   const classes = useStyles();
+
   const {
     id, name, avatar, lastStatus, perks,
   } = user;
+
   const lastStatusData = getActionData(lastStatus && lastStatus.name);
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function handleItemClick() {
+    setMenuOpen((prevMenuOpen) => !prevMenuOpen);
+  }
+
+  function handleMenuClose() {
+    setMenuOpen(false);
+  }
+
   return (
-    <ListItem key={id} button>
-      <ListItemAvatar>
-        <>
+    <>
+      <ListItem key={id} button onClick={handleItemClick}>
+        <ListItemAvatar>
           <Avatar alt={name} src={avatar} />
-          <ActionDial />
-        </>
-      </ListItemAvatar>
-      <ListItemText
-        primary={(
-          <Grid container>
-            <Grid item xs={7}>
-              <Typography variant="subtitle2">{name}</Typography>
-            </Grid>
-            <Grid className={classes.perksContainer} item xs={5}>
-              {
+        </ListItemAvatar>
+        <ListItemText
+          primary={(
+            <Grid container>
+              <Grid item xs={7}>
+                <Typography variant="subtitle2">{name}</Typography>
+              </Grid>
+              <Grid className={classes.perksContainer} item xs={5}>
+                {
                 perks.length > 0
                 && (
                   <Typography
@@ -69,19 +79,21 @@ export default memo(({ user }) => {
                   </Typography>
                 )
               }
+              </Grid>
             </Grid>
-          </Grid>
         )}
-        secondary={(
-          <Typography className={classes.secondary} variant="body2">
-            {
+          secondary={(
+            <Typography className={classes.secondary} variant="body2">
+              {
               lastStatus
                 ? lastStatusData.text
                 : <>&nbsp;</>
             }
-          </Typography>
+            </Typography>
         )}
-      />
-    </ListItem>
+        />
+      </ListItem>
+      <ActionDial open={menuOpen} onClose={handleMenuClose} />
+    </>
   );
 });
