@@ -7,6 +7,7 @@ const logger = console;
 
 logger.log('>>>', firebase);
 // TODO: Replace the following with your app's Firebase project configuration
+console.log(process.env.REACT_APP_FIREBASE_CONFIG);
 const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
 
 // Initialize Firebase

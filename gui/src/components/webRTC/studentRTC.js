@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import firebase from "firebase";
+import React, { Component } from 'react';
+import firebase from 'firebase';
 
 export default class StudentRTC extends Component {
   constructor(props) {
@@ -9,12 +9,17 @@ export default class StudentRTC extends Component {
       database: firebase.database().ref(),
       pc: new RTCPeerConnection(JSON.parse(process.env.REACT_APP_SERVERS)),
     };
+    this.sendMessage = this.sendMessage.bind(this);
+    this.readMessage = this.readMessage.bind(this);
+    this.showMyFace = this.showMyFace.bind(this);
+    this.showFriendsFace = this.showFriendsFace.bind(this);
   }
 
   componentDidMount() {
-    const yourId = this.props.yourId;
-    firebase.initializeApp(this.state.config);
-    this.state.database.on("child_added", this.readMessage);
+    const { yourId } = this.props;
+    // firebase.initializeApp(this.state.config);
+    this.state.database.on('child_added', this.readMessage);
+    this.state.pc.onaddstream = ((event) => this.localVideo.srcObject = event.stream);
     const newPC = this.state.pc;
     newPC.onicecandidate = (event) => (event.candidate
       ? this.sendMessage(yourId, JSON.stringify({ ice: event.candidate }))
@@ -29,30 +34,32 @@ export default class StudentRTC extends Component {
   }
 
   readMessage(data) {
-    const yourId = this.props.yourId;
-    const msg = JSON.parse(data.val().message);
-    const receiver = data.val().receiver;
-    if (receiver === yourId) {
-      if (msg.ice != undefined) {
-        this.state.pc.addIceCandidate(new RTCIceCandidate(msg.ice));
-      } else if (msg.sdp.type == "answer") {
-        this.state.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-        console.log("Got Answer");
+    if (data.val().message && data.val().receiver) {
+      const { yourId } = this.props;
+      const msg = JSON.parse(data.val().message);
+      const { receiver } = data.val();
+      if (receiver === yourId) {
+        if (msg.ice != undefined) {
+          this.state.pc.addIceCandidate(new RTCIceCandidate(msg.ice));
+        } else if (msg.sdp.type == 'answer') {
+          this.state.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+          console.log('Got Answer');
+        }
       }
     }
   }
 
   showFriendsFace() {
-    const yourId = this.props.yourId;
+    const { yourId } = this.props;
     this.state.pc
       .createOffer()
       .then((offer) => this.state.pc.setLocalDescription(offer))
       .then(() => {
         this.sendMessage(
           yourId,
-          JSON.stringify({ sdp: this.state.pc.localDescription })
+          JSON.stringify({ sdp: this.state.pc.localDescription }),
         );
-        console.log("Offer sent");
+        console.log('Offer sent');
       });
   }
 
