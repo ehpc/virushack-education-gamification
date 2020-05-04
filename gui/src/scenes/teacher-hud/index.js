@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
 import FunnyIcon from '../../components/funny-icon';
+import VideoStream from '../../components/webRTC/VideoStream';
 
 const spacing = 3;
 const lessonName = 'Математика для математиков';
@@ -118,7 +119,8 @@ export default function () {
         <Grid className={`${classes.column} ${classes.videoColumn}`} item xs={12} md={6}>
           <Paper className={classes.paper} variant={variant} elevation={elevation}>
             <div className={classes.videoContainer}>
-              <img className={classes.video} src="/img/student-webcam-example.jpg" alt="Изображение из камеры" />
+              <VideoStream/>
+              {/* <img className={classes.video} src="/img/student-webcam-example.jpg" alt="Изображение из камеры" /> */}
             </div>
           </Paper>
         </Grid>
