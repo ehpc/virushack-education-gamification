@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cd guid && yarn build",
+    "build": "cd gui && yarn build",
     "eslint-fix": "eslint --fix ."
   },
   "repository": {
