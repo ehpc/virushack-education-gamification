@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "cd signal && npm start",
     "build": "cd gui && npm install && npx yarn build",
+    "signal": "cd signal && npm start",
     "eslint-fix": "eslint --fix ."
   },
   "repository": {

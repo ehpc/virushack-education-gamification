@@ -27,8 +27,8 @@ export function getRandomAvatar() {
 export function getAvatarForString(str) {
   const hash = str
     .split('')
-    .map(x => x.charCodeAt(0))
-    .reduce((acc, x) => acc +x, 0)
+    .map((x) => x.charCodeAt(0))
+    .reduce((acc, x) => acc + x, 0)
     % avatars.length;
   return avatars[hash];
 }
