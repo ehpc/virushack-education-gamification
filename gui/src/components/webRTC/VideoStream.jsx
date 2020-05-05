@@ -36,7 +36,7 @@ export default class TeacherRTC extends Component {
       'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
     const layer = mobilenet.getLayer('conv_pw_13_relu');
     mobilenet = tf.model({ inputs: mobilenet.inputs, outputs: layer.output });
-    const model = await tf.loadLayersModel('http://localhost:3000/gest-model/model.json');
+    const model = await tf.loadLayersModel('/gest-model/model.json');
   
 
     navigator.mediaDevices

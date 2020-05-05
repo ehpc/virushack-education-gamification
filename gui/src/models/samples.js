@@ -15,6 +15,9 @@ export const avatars = [
   '/img/samples/avatar-masha.jpg',
   '/img/samples/avatar-angelina.jpg',
   '/img/samples/avatar-seymour.jpg',
+  '/img/samples/avatar-neo.jpg',
+  '/img/samples/avatar-spike.jpg',
+  '/img/samples/avatar-shrek.jpg',
 ];
 
 export function getRandomAvatar() {

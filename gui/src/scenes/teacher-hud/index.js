@@ -10,7 +10,6 @@ import random from 'lodash/random';
 import useStyles from './styles';
 import Video from '../../components/video';
 import FunnyIcon from '../../components/funny-icon';
-import VideoStream from '../../components/webRTC/VideoStream';
 import Clock from '../../components/clock';
 import ActionList from '../../components/action-list';
 import UserList from '../../components/user-list';
@@ -114,7 +113,7 @@ export default () => {
             variant={theme.layoutPaperVariant}
             elevation={theme.layoutPaperElevation}
           >
-            <VideoStream/>
+            <Video />
           </Paper>
         </Grid>
         <Grid className={`${classes.column} ${classes.usersColumn}`} item xs={12} lg={3}>

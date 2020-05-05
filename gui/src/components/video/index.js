@@ -1,6 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
+import VideoStream from '../webRTC/VideoStream';
+
 const useStyles = makeStyles((theme) => ({
   videoContainer: {
     backgroundColor: '#000',
@@ -21,7 +23,8 @@ export default () => {
   const classes = useStyles();
   return (
     <div className={classes.videoContainer}>
-      <img id="video" className={classes.video} src="/img/samples/student-webcam-example.jpg" alt="Изображение из камеры" />
+      {/* <img id="video" className={classes.video} src="/img/samples/student-webcam-example.jpg" alt="Изображение из камеры" /> */}
+      <VideoStream />
     </div>
   );
 };
