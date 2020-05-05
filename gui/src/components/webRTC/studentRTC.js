@@ -5,9 +5,10 @@ export default class StudentRTC extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      config: JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG),
+      config: JSON.parse(process.env.REACT_APP_FIREBASE_RTC_SIGNAL_CONFIG),
       database: firebase.database().ref(),
       pc: new RTCPeerConnection(JSON.parse(process.env.REACT_APP_SERVERS)),
+      loading: true,
     };
     this.sendMessage = this.sendMessage.bind(this);
     this.readMessage = this.readMessage.bind(this);
@@ -19,7 +20,10 @@ export default class StudentRTC extends Component {
     const { yourId } = this.props;
     // firebase.initializeApp(this.state.config);
     this.state.database.on('child_added', this.readMessage);
-    this.state.pc.onaddstream = ((event) => this.localVideo.srcObject = event.stream);
+    this.state.pc.onaddstream = ((event) => {
+      this.setState({ loading: false });
+      this.localVideo.srcObject = event.stream;
+    });
     const newPC = this.state.pc;
     newPC.onicecandidate = (event) => (event.candidate
       ? this.sendMessage(yourId, JSON.stringify({ ice: event.candidate }))
@@ -73,6 +77,10 @@ export default class StudentRTC extends Component {
   }
 
   render() {
-    return <video autoPlay muted ref={(video) => (this.localVideo = video)} />;
+    if (this.state.loading) {
+      return <img id="video" className={this.props.className} src="/img/samples/student-webcam-example.jpg" alt="Изображение из камеры" />;
+    } return (
+      <video id="video" className={this.props.className} autoPlay muted ref={(video) => (this.localVideo = video)} />
+    );
   }
 }

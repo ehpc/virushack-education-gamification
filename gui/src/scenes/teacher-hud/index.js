@@ -22,7 +22,7 @@ const roomName = 'Урок "Математика для математиков"'
 const fakeIt = false;
 const defaultActions = Array(20).fill(true).map(() => actionGenerator.next().value);
 
-export default () => {
+export default (props) => {
   const theme = useTheme();
   const classes = useStyles();
 
@@ -113,7 +113,7 @@ export default () => {
             variant={theme.layoutPaperVariant}
             elevation={theme.layoutPaperElevation}
           >
-            <Video />
+            {props.teacher ? <Video teacher /> : <Video />}
           </Paper>
         </Grid>
         <Grid className={`${classes.column} ${classes.usersColumn}`} item xs={12} lg={3}>

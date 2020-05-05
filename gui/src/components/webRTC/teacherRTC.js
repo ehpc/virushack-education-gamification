@@ -5,7 +5,7 @@ export default class TeacherRTC extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // config: JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG),
+      config: JSON.parse(process.env.REACT_APP_FIREBASE_RTC_SIGNAL_CONFIG),
       database: firebase.database().ref(),
       connections: {},
       yourId: this.props.yourId,
@@ -43,16 +43,18 @@ export default class TeacherRTC extends Component {
       const msg = JSON.parse(data.val().message);
       const { sender } = data.val();
       if (sender !== this.state.yourId) {
-        if (msg.ice !== undefined) {
-          const { pc } = this.state.connections[sender];
-          pc.addIceCandidate(new RTCIceCandidate(msg.ice));
-        } else if (msg.sdp.type === 'offer') {
+        if (!this.state.connections[sender]) {
           const newConnections = this.state.connections;
           newConnections[sender] = {
             pc: new RTCPeerConnection(JSON.parse(process.env.REACT_APP_SERVERS)),
             stream: null,
           };
           this.setState({ connections: newConnections });
+        }
+        if (msg.ice !== undefined) {
+          const { pc } = this.state.connections[sender];
+          pc.addIceCandidate(new RTCIceCandidate(msg.ice));
+        } else if (msg.sdp.type === 'offer') {
           const { pc } = this.state.connections[sender];
           pc.onicecandidate = (event) => {
             event.candidate
@@ -67,7 +69,6 @@ export default class TeacherRTC extends Component {
             const newConnections = this.state.connections;
             newConnections[sender].stream = event.stream;
             this.setState({ connections: newConnections });
-            this.localVideo.srcObject = event.stream;
           };
           pc.addStream(this.localVideo.srcObject);
           pc.setRemoteDescription(new RTCSessionDescription(msg.sdp))
@@ -93,6 +94,8 @@ export default class TeacherRTC extends Component {
   }
 
   render() {
-    return <video autoPlay muted ref={(video) => (this.localVideo = video)} />;
+    return (
+      <video id="video" className={this.props.className} autoPlay muted ref={(video) => (this.localVideo = video)} />
+    );
   }
 }

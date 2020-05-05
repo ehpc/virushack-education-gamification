@@ -37,7 +37,7 @@ export default function () {
             <TeacherHud />
           </Route>
           <Route path="/teacher">
-            <TeacherHud />
+            <TeacherHud teacher />
           </Route>
           <Route>
             <Redirect to="/login" />
