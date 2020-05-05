@@ -1,21 +1,33 @@
 import React, { Component } from 'react';
 import predict from './predict';
+import db from '../../models/db'
 
 import * as tf from '@tensorflow/tfjs';
 import * as handTrack from 'handtrackjs';
 import * as faceapi from 'face-api.js';
 
-
+const { updateUserState, onUsers } = db;
 const actions = [
-  'Поднял руку(л)',
-  'Поднял руку(п)',
-  'Всё понятно(л)',
-  'Всё понятно(п)',
-  'Ничё не понятно(л)',
-  'Ничё не понятно(п)',
-  'Не вижу ваши ручки',
-  'Отошёл',
+  'ask',
+  'ask',
+  'yes',
+  'yes',
+  'no',
+  'no',
+  'here',
+  'left',
 ];
+
+// const actions = [
+//   'Поднял руку(л)',
+//   'Поднял руку(п)',
+//   'Всё понятно(л)',
+//   'Всё понятно(п)',
+//   'Ничё не понятно(л)',
+//   'Ничё не понятно(п)',
+//   'Не вижу ваши ручки',
+//   'Отошёл',
+// ];
 
 export default class TeacherRTC extends Component {
   constructor() {
@@ -39,27 +51,33 @@ export default class TeacherRTC extends Component {
     const model = await tf.loadLayersModel('http://localhost:3000/gest-model/model.json');
   
 
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: true,
-        video: {
-          width: { min: 160, ideal: 640, max: 640}, //640, max: 1280 },
-          height: { min: 120, ideal: 540, max: 540}, //360, max: 720 },
-        },
-      })
-      .then((stream) => {
+    // navigator.mediaDevices
+    //   .getUserMedia({
+    //     audio: true,
+    //     video: {
+    //       width: { min: 160, ideal: 640, max: 640}, //640, max: 1280 },
+    //       height: { min: 120, ideal: 540, max: 540}, //360, max: 720 },
+    //     },
+    //   })
+    //   .then((stream) => {
         console.log('stream');
         setInterval(() => {
           const src = this.snapshot();
           predict(src, mobilenet, model, tf, handTrack, faceapi)
-            .then((prediction) => console.log(actions[prediction]));
-        }, 6000);
-        return this.localVideo.srcObject = stream;
-      })
+            .then((prediction) => {
+              if(prediction !== 6) {
+                updateUserState('user_6am0979eykqw4cc', actions[prediction]);
+              }
+              // console.log(actions[prediction])
+            });
+        }, 3300);
+        setTimeout(() => this.localVideo.src ='1.webm', 100)
+        // return this.localVideo.srcObject = stream;
+      // })
   }
 
   snapshot() {
-    var video = document.querySelector('video');
+    var video = this.localVideo; //document.querySelector('video');
     var canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     const width = video.videoWidth;
@@ -73,7 +91,8 @@ export default class TeacherRTC extends Component {
 
   render() {
     return <div>
-      <video autoPlay muted ref={(video) => (this.localVideo = video)} />
+      <video autoPlay muted ref={(video) => (this.localVideo = video)} videowidth='640' videoheight='540' />
+      {/* <video autoPlay muted ref={(video) => (this.localVideo = video)} /> */}
     </div>
   }
 }

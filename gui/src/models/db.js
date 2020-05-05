@@ -157,8 +157,14 @@ async function updateUserStatus(userId, secret, status) {
 async function updateUserState(userId, state) {
   const now = Date.now();
   const userStateQ = await uchilkaDB.ref(`/users/${userId}`).once('value');
-  let userState = userStateQ.val().state;
-  if (!userState || userState.length < 3) { userState = {}; }
+  
+  let userState;
+  if(userStateQ && userStateQ.val()) {
+    userState = userStateQ.val().state
+  }
+   // ??????????
+  
+   if (!userState || userState.length < 3) { userState = {}; }
   userState[now] = state;
   // eslint-disable-next-line prefer-spread
   const latestState = Math.max.apply(Math, Object.keys(userState));
